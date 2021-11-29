@@ -7,9 +7,9 @@
 * The DetailVC has 
   * SAT scores
   * overview of the school
-  * School website - only active when the school has a website
-  * School location - can show the location pin in Maps
-  * School contact number - that shows an option to call the number, given the device has a network provider
+  * School website - opens the school website. Only active when the school has a website
+  * School location - can show the location pin in Maps. Only active when the school has location information
+  * School contact number - that shows an option to call the number, given the device has a network provider. Only active when the school has contact information.
 * Created custom table cells to include a color view on the left side. Since there are no school images, on a long list of schools, this acts as accessibility element
 
 ## Instructions to run the app

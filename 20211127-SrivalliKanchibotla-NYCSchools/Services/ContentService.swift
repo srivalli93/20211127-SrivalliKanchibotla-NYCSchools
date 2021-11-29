@@ -10,7 +10,7 @@ import Foundation
 struct ContentService {
     //fetches data from a URL
     
-    func getContentData(from url: String, completion: @escaping (Result<[SchoolsList],Error>) -> ()) {
+    func getSchoolList(from url: String, completion: @escaping (Result<[SchoolsList],Error>) -> ()) {
         
         URLSession.shared.dataTask(with: URL(string: url)!) { data, response, error in
             
@@ -23,6 +23,29 @@ struct ContentService {
                 //got the data
                 do {
                     let returnData = try JSONDecoder().decode([SchoolsList].self, from: data)
+                    completion(.success(returnData))
+                    
+                } catch {
+                    print("Error: \(error)")
+                    completion(.failure(error))
+                }
+            }
+        }.resume()
+    }
+    
+    func getSatScores(from url: String, completion: @escaping (Result<[SATScores],Error>) -> ()) {
+        
+        URLSession.shared.dataTask(with: URL(string: url)!) { data, response, error in
+            
+            DispatchQueue.main.async {
+                guard let data = data, error == nil else {
+                    print("something went wrong")
+                    return
+                }
+                
+                //got the data
+                do {
+                    let returnData = try JSONDecoder().decode([SATScores].self, from: data)
                     completion(.success(returnData))
                     
                 } catch {

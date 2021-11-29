@@ -14,6 +14,9 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
     var satScores : [SATScores]?
     var filteredSchoolList = [SchoolsList]()
     
+    var loadingIndicator = UIActivityIndicatorView(style: .large)
+    var childView = UIView()
+    
     let searchController = UISearchController(searchResultsController: nil)
     
     var isSearchBarEmpty: Bool {
@@ -25,36 +28,62 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         self.initializeSearchController()
+        self.setupLoadingIndicator()
+        loadingIndicator.startAnimating()
         contentService.getSchoolList(from: "https://data.cityofnewyork.us/resource/s3k6-pzi2.json") { result in
             switch result {
             case .success(let contentData):
                 self.schoolListData = contentData
-                self.tableView.reloadData()
-                self.getSATScores()
+                self.childView.removeFromSuperview()
+                self.loadingIndicator.stopAnimating()
                 self.tableView.separatorColor = .clear
+                self.getSATScores()
             case .failure(let error):
                 print(error)
+                let alertVC = UIAlertController(title: "Error", message: "Could not retrieve the school List. Please try again later.", preferredStyle: .alert)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
             }
         }
     }
+    
+    //Setup loading indicator
+    
+    func setupLoadingIndicator() {
+        loadingIndicator.color = .darkGray
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+       
+        //to prevent the user from taking any action on screen when there is a loading indicator
+        childView.frame = self.view.frame
+        self.view.addSubview(childView)
+        
+        self.view.addSubview(loadingIndicator)
+        
+        loadingIndicator.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        loadingIndicator.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        
+    }
+    
+    //Search bar setup
     
     func initializeSearchController() {
         searchController.searchBar.delegate = self
         searchController.searchResultsUpdater = self
         searchController.searchBar.placeholder = "Search NYC schools"
-        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.sizeToFit()
         navigationItem.searchController = searchController
+        definesPresentationContext = true
     }
-    
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
         searchBar.resignFirstResponder()
         tableView.reloadData()
     }
+    
     func updateSearchResults(for searchController: UISearchController) {
         guard let schoolListData = schoolListData else {
             return
@@ -64,10 +93,11 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
             filteredSchoolList = schoolListData.filter({ (school: SchoolsList) -> Bool in
                 return school.school_name.lowercased().contains(searchController.searchBar.text!.lowercased())
             })
+            tableView.reloadData()
         }
-        
-        tableView.reloadData()
     }
+    
+    //Getting SAT scores and matching it with School list data
     
     func getSATScores() {
         contentService.getSatScores(from: "https://data.cityofnewyork.us/resource/f9bf-2cp4.json") { result in
@@ -104,7 +134,10 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
                 self.schoolListData?.append(matchedSchool)
             }
         }
-
+        
+        //reload tableview after fetching SAT scores in order to avoid mismatched data in DetailVC
+        self.tableView.reloadData()
+        
     }
         
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -126,33 +159,27 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "schoolListCell", for: indexPath) as UITableViewCell
-              
+        let cell = tableView.dequeueReusableCell(withIdentifier: "schoolListCell", for: indexPath) as! SchoolListTableViewCell
         
-        cell.contentView.layoutMargins.top = 32
-        cell.contentView.layoutMargins.bottom = 32
-        cell.contentView.layoutMargins.left = 24
-        cell.contentView.layoutMargins.right = 24
+        guard schoolListData != nil else {
+            return cell
+        }
+
+        let school: SchoolsList
         
-        // TODO: cell design
-//        cell.backgroundColor = .clear
-//        cell.layer.masksToBounds = false
-//        cell.layer.shadowOpacity = 0.20
-//        cell.layer.shadowRadius = 4
-//        cell.layer.shadowOffset = CGSize(width: 0, height: 0)
-//        cell.layer.shadowColor = UIColor.black.cgColor
-//        cell.contentView.backgroundColor = .white
-//        cell.contentView.layer.cornerRadius = 8
-//
-//        let radius = cell.contentView.layer.cornerRadius
-//        cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: radius).cgPath
+        if isFiltering {
+            school = filteredSchoolList[indexPath.row]
+        } else {
+            school = schoolListData![indexPath.row]
+        }
         
+        cell.schoolNameCellTitle.text = school.school_name
         
-        
-        cell.textLabel?.text = schoolListData?[indexPath.row].school_name
-        cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 15.0)
-        cell.detailTextLabel?.text = schoolListData?[indexPath.row].location
-        
+        if let startIndex = school.location!.range(of: "(")?.lowerBound {
+            let locationText = String(school.location![..<startIndex])
+            cell.schoolAddressCellSubtitle.text = locationText
+        }
+        cell.colorPickerForView(indexPath.row % 3)
         return cell
     }
     
@@ -173,13 +200,7 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
         imageView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
         imageView.heightAnchor.constraint(equalTo: headerView.heightAnchor).isActive = true
         imageView.widthAnchor.constraint(equalTo: headerView.widthAnchor).isActive = true
-        
-//        headerView.addSubview(searchController.searchBar)
-//
-//        searchController.searchBar.centerXAnchor.constraint(equalTo: headerView.centerXAnchor).isActive = true
-//        searchController.searchBar.centerYAnchor.constraint(equalTo: headerView.centerYAnchor, constant: imageView.frame.height).isActive = true
-//        searchController.searchBar.widthAnchor.constraint(equalTo: headerView.widthAnchor).isActive = true
-//        searchController.searchBar.heightAnchor.constraint(equalTo: headerView.heightAnchor, constant: -imageView.frame.height).isActive = true
+
         return headerView
     }
     
@@ -189,12 +210,28 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard schoolListData != nil else {
+            return
+        }
+
+        let school: SchoolsList
+        
+        if isFiltering {
+            school = filteredSchoolList[indexPath.row]
+        } else {
+            school = schoolListData![indexPath.row]
+        }
+        
         let detailViewController = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as? DetailViewController
-        detailViewController?.schoolDescriptionText = schoolListData?[indexPath.row].overview_paragraph
-        detailViewController?.schoolNameText = schoolListData?[indexPath.row].school_name
-        detailViewController?.satMathScoreText = schoolListData?[indexPath.row].satScores?.sat_math_avg_score
-        detailViewController?.satReadingScoreText = schoolListData?[indexPath.row].satScores?.sat_critical_reading_avg_score
-        detailViewController?.satWritingScoreText = schoolListData?[indexPath.row].satScores?.sat_writing_avg_score
+        detailViewController?.schoolDescriptionText = school.overview_paragraph
+        detailViewController?.schoolNameText = school.school_name
+        detailViewController?.satMathScoreText = school.satScores?.sat_math_avg_score
+        detailViewController?.satReadingScoreText = school.satScores?.sat_critical_reading_avg_score
+        detailViewController?.satWritingScoreText = school.satScores?.sat_writing_avg_score
+        detailViewController?.phoneNumberInfo = school.phone_number
+        detailViewController?.locationDetails = school.location
+        detailViewController?.schoolWebsiteURL = school.website
         navigationController?.pushViewController(detailViewController ?? self, animated: true)
         
     }

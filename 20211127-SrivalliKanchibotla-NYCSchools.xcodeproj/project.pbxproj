@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		138B812D2754219A00DB6B4D /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138B812C2754219A00DB6B4D /* DetailViewController.swift */; };
+		138B813227556CEC00DB6B4D /* SchoolListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138B813127556CEC00DB6B4D /* SchoolListTableViewCell.swift */; };
 		13B03B912752B5A500A3C016 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B03B902752B5A500A3C016 /* AppDelegate.swift */; };
 		13B03B932752B5A500A3C016 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B03B922752B5A500A3C016 /* SceneDelegate.swift */; };
 		13B03B952752B5A500A3C016 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B03B942752B5A500A3C016 /* ViewController.swift */; };
@@ -41,6 +42,7 @@
 
 /* Begin PBXFileReference section */
 		138B812C2754219A00DB6B4D /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		138B813127556CEC00DB6B4D /* SchoolListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchoolListTableViewCell.swift; sourceTree = "<group>"; };
 		13B03B8D2752B5A500A3C016 /* 20211127-SrivalliKanchibotla-NYCSchools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "20211127-SrivalliKanchibotla-NYCSchools.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B03B902752B5A500A3C016 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		13B03B922752B5A500A3C016 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 				13B03B922752B5A500A3C016 /* SceneDelegate.swift */,
 				13B03B942752B5A500A3C016 /* ViewController.swift */,
 				138B812C2754219A00DB6B4D /* DetailViewController.swift */,
+				138B813127556CEC00DB6B4D /* SchoolListTableViewCell.swift */,
 				13B03B962752B5A500A3C016 /* Main.storyboard */,
 				13B03B992752B5A700A3C016 /* Assets.xcassets */,
 				13B03B9B2752B5A700A3C016 /* LaunchScreen.storyboard */,
@@ -299,6 +302,7 @@
 				13B03B912752B5A500A3C016 /* AppDelegate.swift in Sources */,
 				13B03B932752B5A500A3C016 /* SceneDelegate.swift in Sources */,
 				13B03BC52752C00200A3C016 /* SchoolsList.swift in Sources */,
+				138B813227556CEC00DB6B4D /* SchoolListTableViewCell.swift in Sources */,
 				13B03BC82752C0AB00A3C016 /* ContentService.swift in Sources */,
 				138B812D2754219A00DB6B4D /* DetailViewController.swift in Sources */,
 			);

@@ -85,6 +85,7 @@ class ViewController: UITableViewController, UISearchResultsUpdating, UISearchBa
     }
     
     func updateSearchResults(for searchController: UISearchController) {
+        tableView.tableHeaderView?.isHidden = true
         guard let schoolListData = schoolListData else {
             return
         }

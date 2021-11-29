@@ -40,8 +40,10 @@ class DetailViewController: UIViewController {
         self.phoneNumber.titleLabel?.text = "Phone Number"
         self.location.titleLabel?.text = "View location on Maps"
         
-        
         schoolWebsite.isEnabled = schoolWebsiteURL == nil ? false : true
+        phoneNumber.isEnabled = phoneNumberInfo == nil ? false : true
+        location.isEnabled = locationDetails == nil ? false : true
+        
     }
     
     @IBAction func callPhoneNumber(_ sender: Any) {
